@@ -7,9 +7,10 @@
 //#include "Encoder.h"
 #include "PWM.h"
 #include "TT130.h"
-#include "Serial.h"  //Õâ¸ö¶«Î÷ÏÈ±ğÓÃµÄ¡£µÈµç³ØÓĞµçÁËÔÙËµ¡£Ö±½ÓÈÃpacket[2]µÈÓÚTarget¾ÍĞĞ¡£
+#include "Serial.h"  
 #include<math.h>
 #include<stdio.h>
+#include<string.h>
 
 
 //uint8_t menu_state = 0;
@@ -32,14 +33,21 @@ int main(void)
 		
 	 while (1)
     {
-			Target = 200;			
-			OLED_ShowNum(1, 1, Out, 5);
-			
 			printf("%f,%f,%f\n",Target,CNT,Out/1.4);
+			
+			if(strcmp(Serial_RxPacket, "TwoHundred") == 0)
+				{
+					Target = 200;
+				}
+				else if(strcmp(Serial_RxPacket, "mTwoHundred") == 0)
+				{
+					Target = -200;
+				}
+				Serial_RxFlag = 0;
 		}
 }
 
-void TIM2_IRQHandler(void)     //Õâ¸öµ÷¿ØÖÜÆÚ°¡£¬Ò»°ãÊÇÔ½Ğ¡Ô½ºÃ¡£µ«ÊÇ»áÊÜµ½Ó²¼şÅäÖÃÖÆÔ¼¡£ÕâÀïÎÒÃÇÓÃµÄ»¹ÊÇ1msÖĞ¶ÏÒ»´Î
+void TIM2_IRQHandler(void)    
 {
 	if(TIM_GetITStatus(TIM2, TIM_IT_Update) == SET)
 	{
@@ -49,42 +57,39 @@ void TIM2_IRQHandler(void)     //Õâ¸öµ÷¿ØÖÜÆÚ°¡£¬Ò»°ãÊÇÔ½Ğ¡Ô½ºÃ¡£µ«ÊÇ»áÊÜµ½Ó²¼şÅ
 		ki = 0;
 		kd = 3;
 		
-		static uint8_t count = 0;
+		static uint32_t count = 0;
 		count++;
 		
 		if(count >= 200)
-	{
-		/**********Î»ÖÃÊ½PIDµ÷¿Ø***********/
-		/*»ñÈ¡Êµ¼ÊÖµ*/
-		CNT = GetEncoderCount_Tick();
-		count = 0;
-	}
+		{
+			CNT = GetEncoderCount_Tick1();
+			count = 0;
+		}
 		
-		/*»ñµÃ±¾´ÎÎó²îºÍÉÏ´ÎÎó²î*/
-		error1 = error0;   //ÉÏ´ÎÎó²î¾ÍÊÇÉÏ´ÎµÄ±¾´ÎÎó²î
+		
+		error1 = error0;   
 		error0 = Target - CNT;
-		
-		/*»ı·Ö*/
+	
+	
 		ErrorInt += error0;
 		
-		/*PID¼ÆËã*/
+		
 		Out = kp * error0 + ki * ErrorInt + kd * (error0 - error1); 
 		
-		/*Êä³öÏŞ·ù*/
+		
 		if(Out > 200){Out = 200;}
 		if(Out < -200){Out = -200;}
 		
 		
-		/*Ö´ĞĞ¿ØÖÆ*/
 		if(Out > 0)
 		{
-			Forward();
-			Set_PWMCompare((uint16_t)Out);   //Êä³öÖÁ±»¿Ø¶ÔÏó£¬¶ÔÓÚµç»úÀ´Ëµ£¬±ãÊÇPWM
+			Forward1();
+			Set_PWMCompare1((uint16_t)Out);  
 		}
 		else
 		{
-			Backward();
-			Set_PWMCompare((uint16_t)(-Out));
+			Backward1();
+			Set_PWMCompare1((uint16_t)(-Out));
 		}
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 	}
