@@ -47,12 +47,11 @@ int main(void)
 		}
 }
 
+
 void TIM2_IRQHandler(void)    
 {
 	if(TIM_GetITStatus(TIM2, TIM_IT_Update) == SET)
 	{
-		Key_Tick();
-		
 		kp = 0.8;
 		ki = 0;
 		kd = 3;

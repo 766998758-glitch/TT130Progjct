@@ -153,7 +153,7 @@ void USART1_IRQHandler(void)   //Ê¹ÓÃÖĞ¶ÏÄ£Ê½À´½ÓÊÕÊı¾İ°ü£¨µ±È»£¬²éÑ¯Ä£Ê½Ò²¿ÉÒÔ½
 		}
 		else if(RxState == 1)  //½ÓÊÕÊı¾İ
 		{
-			if(RxData == '\r')
+			if(RxData == '%')
 			{
 				RxState = 2;
 			}
