@@ -11,15 +11,10 @@
 #include<math.h>
 #include<stdio.h>
 #include<string.h>
+#include "PID.h"
 
 
-//uint8_t menu_state = 0;
-float CNT,Out,Target;
-float error0,error1,ErrorInt;
-float kp,ki,kd;
-//uint32_t last_time = 0;
-//uint32_t current_time = 0;
-
+uint8_t state = 0;
 
 int main(void)
 {
@@ -29,67 +24,50 @@ int main(void)
 	PWM_Init();
 	Serial_Init();
 	MotorEncoder_Init();
-	
-		
+    
+  
 	 while (1)
-    {
-			printf("%f,%f,%f\n",Target,CNT,Out/1.4);
+		{
+			float CNT,Out,Target;
 			
-			if(strcmp(Serial_RxPacket, "TwoHundred") == 0)
+			printf("%f,%f,%f\n",Target,CNT,Out/1.3);
+			
+			if(Serial_RxFlag == 1)
+			{
+				if(strcmp(Serial_RxPacket, "ModeOne") == 0 )
 				{
-					Target = 200;
+					OLED_ShowString(1, 1, "SingleRound");
+					state = 1;
 				}
-				else if(strcmp(Serial_RxPacket, "mTwoHundred") == 0)
-				{
-					Target = -200;
+				else if(state == 1){
+					if(strcmp(Serial_RxPacket, "TwoHundred") == 0)
+					{
+						Target = 300;
+					}
+					else if(strcmp(Serial_RxPacket, "mTwoHundred") == 0)
+					{
+						Target = -300;
+					}
+					else if(strcmp(Serial_RxPacket, "Zero") == 0)
+					{
+						Target = 0;
+					}
 				}
 				Serial_RxFlag = 0;
+			}
 		}
 }
 
 
-void TIM2_IRQHandler(void)    
+void TIM1_UP_IRQHandler(void)    
 {
-	if(TIM_GetITStatus(TIM2, TIM_IT_Update) == SET)
+	
+	if(TIM_GetITStatus(TIM1, TIM_IT_Update) == SET)
 	{
-		kp = 0.8;
-		ki = 0;
-		kd = 3;
-		
-		static uint32_t count = 0;
-		count++;
-		
-		if(count >= 200)
-		{
-			CNT = GetEncoderCount_Tick1();
-			count = 0;
-		}
+			void PID_Mode();
+
 		
 		
-		error1 = error0;   
-		error0 = Target - CNT;
-	
-	
-		ErrorInt += error0;
-		
-		
-		Out = kp * error0 + ki * ErrorInt + kd * (error0 - error1); 
-		
-		
-		if(Out > 200){Out = 200;}
-		if(Out < -200){Out = -200;}
-		
-		
-		if(Out > 0)
-		{
-			Forward1();
-			Set_PWMCompare1((uint16_t)Out);  
-		}
-		else
-		{
-			Backward1();
-			Set_PWMCompare1((uint16_t)(-Out));
-		}
-		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+		TIM_ClearITPendingBit(TIM1, TIM_IT_Update);
 	}
 }

@@ -42,12 +42,12 @@ void PWM_Init()
 	TIM_OC3Init(TIM2, &TIM_OCInitStructure);
 	TIM_OC4Init(TIM2, &TIM_OCInitStructure);
 	
-	NVIC_InitTypeDef NVIC_InitStructure;
-  NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-  NVIC_Init(&NVIC_InitStructure);
+//	NVIC_InitTypeDef NVIC_InitStructure;         //只是为了获取编码器的值，不开中断抢CPU了。把定时中断的事情全交给TIM去做
+//  NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+//  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+//  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+//  NVIC_Init(&NVIC_InitStructure);
 	TIM_Cmd(TIM2, ENABLE);
 		
 }

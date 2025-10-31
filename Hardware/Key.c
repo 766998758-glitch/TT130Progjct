@@ -16,7 +16,7 @@ void Key_Init(void)
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 	
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
 
 }
@@ -51,7 +51,7 @@ uint8_t Key_GetState(void) //获取当前按键状态
 	{
 		return 3;
 	}
-	if(GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_14) == 0)  
+	if(GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_13) == 0)  
 	{
 		return 4;
 	}
