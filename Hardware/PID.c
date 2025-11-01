@@ -3,6 +3,7 @@
 #include "PWM.h"
 #include "TT130.h"
 #include <string.h>
+#include <math.h>
 #include "OLED.h"
 
 
@@ -19,9 +20,9 @@ void PID_Mode1(void)
 				if(PID_state == 1)
 				{
 					//位置式PID控速
-					kp = 0.6;
+					kp = 0.7;
 					ki = 0;
-					kd = 4;
+					kd = 2;
 					static uint32_t count1 = 0;
 					count1++;
 					if(count1 >= 12)
@@ -35,6 +36,7 @@ void PID_Mode1(void)
 					Out = kp * error0 + ki * ErrorInt + kd * (error0 - error1); 
 					if(Out > 200){Out = 200;}
 					if(Out < -200){Out = -200;}
+					
 					if(Out > 0)
 					{
 						Forward1();
@@ -53,23 +55,44 @@ void PID_Mode2(void)
 {
 				if(PID_state == 2)
 				{
-					//增量式PID控位置
-					//注意这个代码架构啊。电机1是不转的，电机2的目标值是电机1的实际值
-					kp = 0.6;
-					ki = 0;
-					kd = 4;
-					float master_position = GetEncoderCount_Tick1();
-					float follow_position = GetEncoderCount_Tick2();
-
-					float follow_target = master_position;
-					error2 = error1;
-					error1 = error0;
-					error0 = follow_target - follow_position;
-					float delta_out = kp*(error0 - error1) +
-                         		ki* error0 +
-                         	  kd*(error0 - 2*error1 + error2);
-        		    Out = last_output + delta_out;
-        		    last_output = Out;
+					
+					//老实了，还是用位置式吧
+					kp = 0.2; ki = 0; kd = 2;
+        
+        static float initial_master_pos = 0;
+        static uint8_t first_enter = 1;
+        static float last_error = 0;
+        static float error_sum = 0;
+        
+        // 首次进入时记录电机1的初始位置
+        if(first_enter) {
+            initial_master_pos = GetEncoderCount_Tick1();
+            first_enter = 0;
+            last_error = 0;
+            error_sum = 0;
+            Out = 0;  // 重置输出
+        }
+        
+        float master_position = GetEncoderCount_Tick1();
+        float follow_position = GetEncoderCount_Tick2();
+        
+        // 目标值 = 初始位置 + (电机1当前位置 - 初始位置)
+        // 这样初始误差为0
+        float follow_target = master_position;        
+        float error = follow_target - follow_position;
+        
+        // 死区控制
+        if(fabs(error) < 3.0f) {
+            error = 0;
+            error_sum = 0;
+        }
+        
+        error_sum += error;
+        float derivative = error - last_error;
+        last_error = error;
+        
+        Out = kp * error + ki * error_sum + kd * derivative;
+        
 					if(Out >= 200){Out = 200;}
 					if(Out <= -200){Out = -200;}
 					if(Out > 0){
