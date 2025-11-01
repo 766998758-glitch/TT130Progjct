@@ -3,18 +3,19 @@
 #include "OLED.h"
 #include "Key.h"
 #include "Timer.h"
-//#include "Cursor2.h"
-//#include "Encoder.h"
 #include "PWM.h"
 #include "TT130.h"
 #include "Serial.h"  
-#include<math.h>
-#include<stdio.h>
-#include<string.h>
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
 #include "PID.h"
 
 
 uint8_t state = 0;
+float CNT,Out,Target;
+int PID_state;
+
 
 int main(void)
 {
@@ -27,19 +28,28 @@ int main(void)
     
   
 	 while (1)
-		{
-			float CNT,Out,Target;
-			
+		{			
 			printf("%f,%f,%f\n",Target,CNT,Out/1.3);
 			
 			if(Serial_RxFlag == 1)
 			{
 				if(strcmp(Serial_RxPacket, "ModeOne") == 0 )
 				{
+					OLED_Clear();
 					OLED_ShowString(1, 1, "SingleRound");
 					state = 1;
+					PID_state = 1;
 				}
-				else if(state == 1){
+				else if(strcmp(Serial_RxPacket, "ModeTwo") == 0)
+				{
+					OLED_Clear();
+					OLED_ShowString(1, 1, "Follow");
+					state = 2;
+					PID_state = 2;
+				}
+
+				
+				if(state == 1){
 					if(strcmp(Serial_RxPacket, "TwoHundred") == 0)
 					{
 						Target = 300;
@@ -64,10 +74,22 @@ void TIM1_UP_IRQHandler(void)
 	
 	if(TIM_GetITStatus(TIM1, TIM_IT_Update) == SET)
 	{
-			void PID_Mode();
-
-		
+			switch(PID_state)
+			{
+				case 1:{PID_Mode1();
+								break;}
+				case 2:{PID_Mode2();
+				        break;}
+				default:{Set_PWMCompare1(0);
+								 Set_PWMCompare2(0);
+								break;}
+				
+			}
 		
 		TIM_ClearITPendingBit(TIM1, TIM_IT_Update);
 	}
 }
+
+
+
+

@@ -30,11 +30,11 @@ void MotorEncoder_Init(void)
 	TIM_Cmd(TIM3, ENABLE);
 	
 		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);  //必须再开一个定时器，要不然会冲突
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
     
     GPIO_InitTypeDef GPIO_InitStructureB;
     GPIO_InitStructureB.GPIO_Mode = GPIO_Mode_IPU;
-    GPIO_InitStructureB.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_15;
+    GPIO_InitStructureB.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
     GPIO_InitStructureB.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOA, &GPIO_InitStructureB);
     
