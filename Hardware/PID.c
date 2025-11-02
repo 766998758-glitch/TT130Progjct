@@ -57,22 +57,12 @@ void PID_Mode2(void)
 				{
 					
 					//老实了，还是用位置式吧
-					kp = 0.2; ki = 0; kd = 2;
+					kp = 0.22; ki = 0; kd = 2;
         
-        static float initial_master_pos = 0;
-        static uint8_t first_enter = 1;
         static float last_error = 0;
         static float error_sum = 0;
         
-        // 首次进入时记录电机1的初始位置
-        if(first_enter) {
-            first_enter = 0;
-            last_error = 0;
-            error_sum = 0;
-            Out = 0;  // 重置输出
-        }
-        
-        float master_position = GetEncoderCount_Tick1()+5;
+        float master_position = GetEncoderCount_Tick1()+5.65;
         float follow_position = GetEncoderCount_Tick2();
         
         // 目标值 = 初始位置 + (电机1当前位置 - 初始位置)
@@ -85,11 +75,11 @@ void PID_Mode2(void)
             error = 0;
             error_sum = 0;
         }
-        
+//        
         error_sum += error;
         float derivative = error - last_error;
         last_error = error;
-        
+      
         Out = kp * error + ki * error_sum + kd * derivative;
         
 					if(Out >= 200){Out = 200;}
