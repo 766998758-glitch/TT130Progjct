@@ -66,14 +66,13 @@ void PID_Mode2(void)
         
         // 首次进入时记录电机1的初始位置
         if(first_enter) {
-            initial_master_pos = GetEncoderCount_Tick1();
             first_enter = 0;
             last_error = 0;
             error_sum = 0;
             Out = 0;  // 重置输出
         }
         
-        float master_position = GetEncoderCount_Tick1();
+        float master_position = GetEncoderCount_Tick1()+5;
         float follow_position = GetEncoderCount_Tick2();
         
         // 目标值 = 初始位置 + (电机1当前位置 - 初始位置)
