@@ -29,7 +29,7 @@ int main(void)
   
 	 while (1)
 		{			
-			printf("%f,%f,%f\n",Target,CNT,Out/1.3);
+			printf("%f,%f,%f\n",Target,CNT,Out);
 			
 			if(Serial_RxFlag == 1)
 			{
@@ -52,11 +52,11 @@ int main(void)
 				if(state == 1){
 					if(strcmp(Serial_RxPacket, "TwoHundred") == 0)
 					{
-						Target = 300;
+						Target = 80;
 					}
 					else if(strcmp(Serial_RxPacket, "mTwoHundred") == 0)
 					{
-						Target = -300;
+						Target = -80;
 					}
 					else if(strcmp(Serial_RxPacket, "Zero") == 0)
 					{
@@ -67,6 +67,19 @@ int main(void)
 			}
 		}
 }
+
+
+
+void TIM2_IRQHandler(void)    
+{
+	
+	if(TIM_GetITStatus(TIM2, TIM_IT_Update) == SET)
+	{
+		Key_Tick();
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+	}
+}
+
 
 
 void TIM1_UP_IRQHandler(void)    
