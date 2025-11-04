@@ -10,7 +10,7 @@ void PWM_Init()
 	
 	GPIO_InitTypeDef GPIO_InitStructure1;
 	GPIO_InitStructure1.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStructure1.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;  
+	GPIO_InitStructure1.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_0;  
 	GPIO_InitStructure1.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure1);
 	
@@ -39,6 +39,7 @@ void PWM_Init()
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 	TIM_OCInitStructure.TIM_Pulse = 0;		//CCR
 	
+	TIM_OC1Init(TIM2, &TIM_OCInitStructure);
 	TIM_OC3Init(TIM2, &TIM_OCInitStructure);
 	TIM_OC4Init(TIM2, &TIM_OCInitStructure);
 	

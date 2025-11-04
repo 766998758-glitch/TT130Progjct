@@ -68,7 +68,7 @@ void Key_Tick(void){         //你的第一个”状态机“，用于配合TIM中断来消除抖动
 	
 	count++;
 	
-	if(count>=20)       //这个20指20ms，我们用的是20ms中断一次
+	if(count>=200)       //这个20指20ms，我们用的是20ms中断一次
 	{
 		count=0;
 		PrevState = CurrState;
